@@ -1,0 +1,11 @@
+# Étape 2 du projet (optionnelle) : extraction PostgreSQL -> graphiques.
+# Les analyses SQL des fichiers sql/01 à sql/06 n'ont AUCUNE de ces
+# dépendances : elles tournent avec psql seul.
+pandas>=2.2
+numpy>=1.26
+matplotlib>=3.9
+statsmodels>=0.14
+scipy>=1.11
+SQLAlchemy>=2.0
+psycopg2-binary>=2.9
+python-dotenv>=1.0

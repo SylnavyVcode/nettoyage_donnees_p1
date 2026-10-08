@@ -1,7 +1,62 @@
-# Environnement
+# ---------------------------------------------------------------------
+# Secrets — jamais versionnés
+# ---------------------------------------------------------------------
 .env
+*.pgpass
+.pgpass
+
+# ---------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------
 .venv/
 venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------
+# Dumps et sauvegardes PostgreSQL
+# ---------------------------------------------------------------------
+*.dump
+*.backup
+*.sql.gz
+
+# ---------------------------------------------------------------------
+# Données DÉRIVÉES uniquement.
+#
+# Choix assumé : data/raw/movieData.csv EST versionné (100 Ko, données
+# publiques issues de Wikipédia). Sans lui, personne ne peut rejouer le
+# projet — ce qui ruinerait l'intérêt d'un dépôt portfolio.
+# En revanche tout ce que les scripts régénèrent reste hors du dépôt.
+# ---------------------------------------------------------------------
+data/processed/*
+!data/processed/.gitkeep
+
+# ---------------------------------------------------------------------
+# Sorties d'exécution.
+#
+# Exception : results/reports/*.txt et results/tables/*.csv sont
+# volontairement CONSERVÉS. Un recruteur doit pouvoir lire les résultats
+# sans installer PostgreSQL. Seules les figures lourdes sont exclues si
+# elles dépassent une taille raisonnable (ici elles restent, <200 Ko).
+# ---------------------------------------------------------------------
+results/**/*.tmp
+
+# ---------------------------------------------------------------------
+# Éditeurs et système
+# ---------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+
+# .vscode/settings.json est VOLONTAIREMENT versionné : il contient la
+# configuration SQLTools du projet (sans mot de passe) et fait gagner
+# un quart d'heure à quiconque clone le dépôt.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
 
 # PostgreSQL
 *.dump
