@@ -427,3 +427,118 @@ Le code de ce dépôt (SQL, Bash, Python) est publié sous licence MIT
 
 **MABIKA Sylnavy**
 Développeur web fullstack · QA · Statisticien-économiste
+
+
+
+
+
+# Installation et utilisation
+
+## 1. Comprendre les outils
+
+| Outil | Rôle | Lit le `.env` ? |
+|---|---|---|
+| **PostgreSQL** | le serveur de base de données (« la cuisine ») | non |
+| **psql** | client en ligne de commande, utilisé par `scripts/run_sql.sh` | oui, via les variables `PG*` |
+| **SQLTools** (VS Code) | client graphique pour explorer interactivement | **non** : sa connexion se configure à part |
+| **pgAdmin 4** | client graphique d'administration | **non** : idem |
+
+Tous parlent au même serveur. Le `.env` ne sert qu'aux scripts du projet (`psql` et `analysis.py`).
+
+## 2. Prérequis
+
+```bash
+# Ubuntu / Debian
+sudo apt install postgresql postgresql-client
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## 3. Créer la base et le `.env`
+
+```bash
+# Créer la base (une seule fois)
+sudo -u postgres createdb movie_data
+
+# Définir un mot de passe pour l'utilisateur postgres (si ce n'est pas déjà fait)
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'votre_mot_de_passe';"
+
+# Créer votre .env à partir du modèle, puis éditer PGPASSWORD
+cp .env.example .env
+```
+
+Contenu du `.env` (aucun espace autour du `=`) :
+
+```bash
+PGHOST=localhost
+PGPORT=5432
+PGUSER=postgres
+PGPASSWORD=votre_mot_de_passe
+PGDATABASE=movie_data
+```
+
+Vérifier la connexion :
+
+```bash
+set -a; source .env; set +a
+psql -c "SELECT current_database(), current_user;"
+```
+
+## 4. Lancer les requêtes
+
+```bash
+chmod +x scripts/*.sh                       # une seule fois
+
+./scripts/run_sql.sh 01_create_tables.sql   # un fichier
+./scripts/run_sql.sh 02_import_data.sql 03_clean_data.sql   # plusieurs
+./scripts/run_all.sh                        # tout : SQL 01 -> 06 puis Python
+./scripts/run_all.sh --sql-only             # SQL seulement
+```
+
+Chaque exécution écrit sa sortie dans `results/reports/<fichier>.txt` ; `06_export_results.sql` écrit les CSV dans `results/tables/` et `data/processed/`. Le script s'arrête à la première erreur SQL.
+
+Ordre à respecter la première fois : `01` → `02` → `03` → `04` → `05` → `06`. Ensuite, chaque fichier peut être relancé seul ; `01` repart de zéro.
+
+## 5. Relier SQLTools au projet
+
+1. Installer les extensions **SQLTools** et **SQLTools PostgreSQL/Cockroach Driver**.
+2. Créer `.vscode/settings.json` à la racine du projet (déjà dans le `.gitignore`) :
+
+```json
+{
+  "sqltools.connections": [
+    {
+      "name": "movie_data (local)",
+      "driver": "PostgreSQL",
+      "server": "localhost",
+      "port": 5432,
+      "database": "movie_data",
+      "username": "postgres",
+      "askForPassword": true
+    }
+  ]
+}
+```
+
+3. `Ctrl+Shift+P` → *SQLTools: Connect* → choisir la connexion, saisir le mot de passe.
+4. Ouvrir un fichier de `sql/`, sélectionner une requête, puis `Ctrl+E` `Ctrl+E` pour l'exécuter.
+
+**Limite importante** : les lignes commençant par un antislash (`\echo`, `\copy`, `\o`, `\pset`, `\dt`) sont des commandes **psql**. SQLTools et pgAdmin ne les comprennent pas. Dans SQLTools, exécutez seulement les requêtes `SELECT` / `CREATE` ; pour `02_import_data.sql` et `06_export_results.sql`, utilisez `run_sql.sh`.
+
+## 6. pgAdmin 4
+
+*Servers → Register → Server* : Host `localhost`, Port `5432`, Maintenance database `movie_data`, Username `postgres`. Utile pour visualiser les tables et les vues (`v_movie_metrics`, `v_genre_stats`, …).
+
+## 7. Erreurs courantes
+
+| Message | Cause | Correction |
+|---|---|---|
+| `psql: command not found` | client absent du PATH | `sudo apt install postgresql-client`, puis `which psql` |
+| `Connection refused` | serveur arrêté | `sudo systemctl start postgresql` |
+| `password authentication failed` | mot de passe du `.env` ≠ celui de PostgreSQL | refaire `ALTER USER ... PASSWORD`, tester avec `psql -h localhost -U postgres` |
+| `database "movie_data" does not exist` | base non créée | `sudo -u postgres createdb movie_data` |
+| `relation "movie_data_raw" does not exist` | `01` pas exécuté | exécuter `01` puis `02` |
+| `data/raw/movieData.csv: No such file` | script lancé hors de la racine | utiliser `./scripts/run_sql.sh` (il se place à la racine) |
+| `permission denied` à l'import | `COPY` utilisé à la place de `\copy` | garder `\copy` (lecture côté client) |
+| `syntax error` sur `\copy` | commande répartie sur plusieurs lignes | `\copy` doit tenir sur une seule ligne |
+| Variables vides dans le script | espaces autour du `=` dans `.env` | écrire `PGUSER=postgres` |
