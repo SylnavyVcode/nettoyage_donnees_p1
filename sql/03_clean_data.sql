@@ -13,22 +13,43 @@ INSERT INTO movie_data (
     budget, revenue
 )
 SELECT
+    -- BTRIM() retire les espaces en début et fin de chaîne, on peut aussi utiliser TRIM()
     BTRIM(movie_title),
+
+    -- conversion de la valeur de la variable release_date (TEXT) en type DATE
     release_date::DATE,                                  -- '2016-03-08' (ISO)
     BTRIM(wikipedia_url),
     BTRIM(genre),
     BTRIM(director_1),
+
+    -- La fonction NULLIF() en SQL permet de comparer deux valeurs et de retourner NULL 
+    -- si elles sont égales. Si elles sont différentes, elle retourne la première valeur.
     NULLIF(BTRIM(director_2), ''),                       -- vide -> NULL
     BTRIM(cast_1),
     NULLIF(BTRIM(cast_2), ''),
     NULLIF(BTRIM(cast_3), ''),
     NULLIF(BTRIM(cast_4), ''),
     NULLIF(BTRIM(cast_5), ''),
+
     -- '$15,000,000.00' -> 15000000.00 : on retire tout sauf chiffres et point
+    -- Cette ligne SQL sert à nettoyer une valeur monétaire pour la transformer 
+    -- en nombre utilisable dans PostgreSQL.
+
+    -- REGEXP_REPLACE(texte, motif, remplacement, options)
     REGEXP_REPLACE(budget,  '[^0-9.]', '', 'g')::NUMERIC,
     REGEXP_REPLACE(revenue, '[^0-9.]', '', 'g')::NUMERIC
 FROM movie_data_raw
 ORDER BY BTRIM(movie_title);
+
+
+-- Que signifie précisément '[^0-9.]' ?
+-- C'est la partie la plus importante à comprendre.
+-- - 0-9 signifie tous les chiffres de 0 à 9.
+-- - . à l'intérieur de cette expression signifie le point décimal littéral.
+-- - ^, placé juste après [, signifie « tout caractère qui ne fait pas partie de cette liste ».
+-- Donc, [^0-9.] signifie : tout caractère qui n'est ni un chiffre ni un point.
+
+
 
 -- ---------------------------------------------------------------------
 -- Vue principale : métriques calculées par film
@@ -36,6 +57,8 @@ ORDER BY BTRIM(movie_title);
 --   roi              = (revenue - budget) / budget (1.0 = +100 %)
 --   revenue_multiple = revenue / budget
 -- ---------------------------------------------------------------------
+
+
 CREATE OR REPLACE VIEW v_movie_metrics AS
 SELECT
     m.*,

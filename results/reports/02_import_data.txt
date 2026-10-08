@@ -1,0 +1,7 @@
+TRUNCATE TABLE
+COPY 508
+ lignes_importees 
+------------------
+              508
+(1 row)
+

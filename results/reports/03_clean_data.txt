@@ -1,0 +1,16 @@
+TRUNCATE TABLE
+INSERT 0 508
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+psql:sql/03_clean_data.sql:109: NOTICE:  OK : 508 lignes nettoyees
+DO
+ movie_id |                movie_title                | release_date |  genre   |   budget    |   revenue    
+----------+-------------------------------------------+--------------+----------+-------------+--------------
+        1 | 10 Cloverfield Lane                       | 2016-03-08   | Thriller | 15000000.00 | 108300000.00
+        2 | 13 Hours: The Secret Soldiers of Benghazi | 2016-01-15   | Action   | 45000000.00 |  69400000.00
+        3 | 21 Jump Street                            | 2012-03-16   | Comedy   | 55000000.00 | 201500000.00
+        4 | 22 Jump Street                            | 2014-06-04   | Action   | 84500000.00 | 331300000.00
+        5 | 2 Guns                                    | 2013-08-02   | Action   | 61000000.00 | 131900000.00
+(5 rows)
+

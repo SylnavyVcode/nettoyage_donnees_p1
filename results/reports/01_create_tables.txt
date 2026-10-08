@@ -1,0 +1,15 @@
+DROP TABLE
+psql:sql/01_create_tables.sql:10: NOTICE:  drop cascades to 3 other objects
+DETAIL:  drop cascades to view v_movie_metrics
+drop cascades to view v_movie_cast
+drop cascades to view v_movie_director
+DROP TABLE
+CREATE TABLE
+CREATE TABLE
+               List of tables
+ Schema |      Name      | Type  |  Owner   
+--------+----------------+-------+----------
+ public | movie_data     | table | postgres
+ public | movie_data_raw | table | postgres
+(2 rows)
+

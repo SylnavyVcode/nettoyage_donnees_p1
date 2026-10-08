@@ -1,14 +1,13 @@
 {
-    "sqltools.connections": [
-        {
-            "ssh": "Disabled",
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5432,
-            "driver": "PostgreSQL",
-            "name": "dashboard",
-            "database": "dashboard",
-            "username": "postgres"
-        }
-    ]
+  "sqltools.connections": [
+    {
+      "name": "movie_data (local)",
+      "driver": "PostgreSQL",
+      "server": "localhost",
+      "port": 5432,
+      "database": "movie_data",
+      "username": "postgres",
+      "askForPassword": true
+    }
+  ]
 }
