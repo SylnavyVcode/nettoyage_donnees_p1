@@ -1,1 +1,20 @@
+# Environnement
 .env
+.venv/
+venv/
+
+# PostgreSQL
+*.dump
+*.backup
+
+# Données volumineuses
+data/raw/*
+data/processed/*
+
+# Système
+.DS_Store
+__pycache__/
+
+
+*.sql.bak
+*.log
